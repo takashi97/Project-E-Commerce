@@ -1,6 +1,6 @@
-
 import './App.css';
 import React from 'react';
+
 
 class Login extends React.Component {
 
@@ -8,32 +8,41 @@ class Login extends React.Component {
     super(props);
 
     this.state = {
-      username: "",
-      password: "",
+      username:"",
+        password:"",
       errorMessage: ""
     };
   }
 
   onLogin = () => {
-    if (this.state.username === "atmajaya" && this.state.password === "atma2022") {
-      this.props.changePage("home");
+    if(this.props.users.find(nUser => (nUser.username === this.state.username && nUser.password === this.state.password)))
+    {this.props.changePage("home");
+    this.props.setCurrentUser(this.props.users.find(nUser => (nUser.username === this.state.username && nUser.password === this.state.password)))
     } else {
-      this.setState({ errorMessage: "Invalid Login" });
+      this.setState({ errorMessage: "Invalid Login Info" });
     }
+  }
+  onRegister = () => {
+    this.props.changePage("register");
   }
 
   render() {
     return (
       <div className="Login">
+         <div className="Auth-form-container">
+         <form className="Auth-form">
         <div>
-          <label>Username</label>
+          <h1> Sign In</h1>
+        </div>
+        <div>
+          <label>Username </label>
           <input
             value={this.state.username}
             onChange={event => this.setState({ username: event.target.value })}
           />
         </div>
         <div>
-          <label>Password</label>
+          <label>Password </label>
           <input type="password"
             value={this.state.password}
             onChange={event => this.setState({ password: event.target.value })}
@@ -45,9 +54,15 @@ class Login extends React.Component {
             <label>{this.state.errorMessage}<br /></label> :
             null
         }
-        <button onClick={this.onLogin}>
-          Login
+        <button onClick={this.onLogin} style={{ marginTop: 20}}>
+          Masuk
         </button>
+
+        <p className="text-center mt-2">
+            New? <a href="#" onClick={this.onRegister}>Register</a>
+          </p>
+        </form>
+      </div>
       </div>
     );
   }

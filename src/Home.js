@@ -1,92 +1,83 @@
-
 import './App.css';
 import React from 'react';
 import axios from 'axios';
-import AgeComponent from './AgeComponent.js';
+import Navbar from 'react-bootstrap/Navbar';  
+
+
 class Home extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      name: "Tobias",
-      age: 22,
-      students : [""],
-      newStudent: "",
-      editStudent: "",
-      editStudentIndex: -1,
-      fruitID: "",
-      fruitName: "",
+      uName: "",
+      product:"",
+      products:[],
+      item:"",
+      productsList:[],
 
     };
   }
   componentDidUpdate() {
     console.log("Name is Updated.")
   }
-  incrementAge(){
-    this.setState({ age: this.state.age + 1 });
-  }
-  //incrementAge = () =>{
-  //  this.setState({ age: this.state.age + 1 });
-  //}
-  //Bind bisa dihilangkan
-  decrementAge(){
-    this.setState({ age: this.state.age - 1 });
-  }
-  studentAdd(){
-    const students = this.state.students
-    students.push(this.state.name)
-    this.setState({students})
-  }
+  
   onLogout = () => {
     this.props.changePage("login")
   }
+  onCart = () => {
+    this.setState({ page: "cart" })
+  }
   componentDidMount() {
-    // axios.get("/api/fruit/all").then(res => {
-    //   this.setState({
-    //     students: res.data.map(fruit => fruit.name)
-    //   })
-    // })
-    axios.get("/api/fruit/all").then(res => {
+    axios.get("https://online.akomate.com/atma/api/products").then(res => {
       this.setState({
-        students: res.data.map(fruit => fruit.name)
+        products: res.data
+
       })
     }) 
   }
-  handleSearch = () => {
-    axios.get(`/api/fruit/${this.state.fruitID}`).then(res =>{
-      this.setState({
-        fruitName: res.data.name
-      })
-    }).catch(err => {
-      this.setState({
-        fruitName: "Not Found"
-      })
-    })
-
-  }
-  //#Ver01
-  //studentDel = (student)  => () =>{
-  //  const students = this.state.students.filter(name => {
-  //    
-  //    return student !== name
-        
+  addToCart(){
     
-  //  })
-  //  this.setState({students})
-  //}
+  }
+  
   
   render() {
     return (
       <div className="App">
-        <h1>Hello, my name is {this.state.name}</h1>
-        <AgeComponent 
-        age={this.state.age}
-        incrementAge={this.incrementAge.bind(this)}
-        decrementAge={this.decrementAge.bind(this)}
-        />
+        <Navbar expand="lg" variant="light" bg="dark">
+        <span class="row d-flex justify-content-center" style={{color: 'white'}}>{' '}
+              Welcome, {this.props.currentUser.username} to E-Commerce 
+              <button onClick={this.onLogout}>Logout </button>
+        </span>
+        </Navbar>
+        
+        
+        <input
+            value={this.state.item}
+            onChange={event => this.setState({item: event.target.value })}
+          />
         <br>
         </br>
+        <h3>Items List</h3>
+        <ul>
+          
+        
+        {
+        this.state.products.filter((searchProduct => 
+          searchProduct.name.toLowerCase().includes(this.state.item.toLowerCase()))).map((product) => {
+            return <ul>
+              <img src={product.image} alt="for sell"></img>
+              <h2>{product.name}</h2>
+              <p>{product.detail}</p>
+              <p>Harga: Rp.{product.price}</p>
+              <button style={{ marginBottom: 20}} onClick={this.addToCart}>Add To Cart </button>
+        </ul>
+        })
+      }
+      {/* {
+        <Cart changePage={this.changePage} users={this.state.users} setCurrentUser={this.setCurrentUser}/>
+      } */}
+        </ul>
         {
         //Ver01
         //this.state.students.map(student => {
@@ -95,70 +86,8 @@ class Home extends React.Component {
         //  <button onClick={this.studentDel(student)}>DELETE</button>
         //  </p>
         // })
-        this.state.students.map((student,index) => {
-          if(index === this.state.editStudentIndex){
-          return <li key={index}>
-          <input
-          
-           value={this.state.editStudent}
-           onChange={event => this.setState({ editStudent: event.target.value})}>
-           
-           </input>  
-           <button onClick={() => this.setState({
-             editStudentIndex:-1,
-             students:this.state.students.map((s,i) =>{
-             if(i === index){
-               return this.state.editStudent;
-             }
-             else{
-               return s;
-             }
-             })
-           })}>
-             Save
-           </button>
-           </li>
-          }
-          else{
-          return <li key={index}>
-            <label style={{marginRight:20}}>
-              {student}
-            </label>
-            <button onClick={() => this.setState({students:
-            this.state.students.filter((s, i) => i !== index)})}>DELETE</button>
-            
-            <button onClick={() => this.setState({editStudentIndex:index,editStudent:student})}>EDIT</button>
-          </li>
-          }
-
-        })
         }
 
-
-        <br>
-        </br>
-        <input 
-          value={this.state.name}
-          onChange={event => this.setState({ name: event.target.value})}
-        />
-
-        <button onClick={this.studentAdd.bind(this)}>Add</button>
-        <br />
-        <button onClick={this.onLogout}>
-          Logout
-        </button>
-        <br>
-        </br>
-        <input
-            value={this.state.fruitID}
-            onChange={event => this.setState({fruitID: event.target.value })}
-          />
-        <button onClick={this.handleSearch}>
-          Search
-        </button>
-        <br>
-        </br>
-        <label>{this.state.fruitName}</label>
       </div>
     );
   }
